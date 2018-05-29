@@ -54,7 +54,6 @@ def _mklist(args):
 _mod_path = os.path.dirname(os.path.abspath(__file__))
 _mad_path = os.path.join(_mod_path, "libmadx-linux64-gnu.so")
 
-_buffer = _char50()
 
 
 class Mad(object):
@@ -106,7 +105,7 @@ class Mad(object):
         return value.value
 
     def get_table_string(self, table, column, row):
-        value = _buffer
+        value = ct.create_string_buffer(50)
         row = _int(row)
         self.lib.string_from_table_row_(
             table.encode(), column.encode(), row, value)
@@ -118,13 +117,27 @@ class Mad(object):
     def get_column_double(self, table, column):
         length = self.get_table_length(table)
         out = np.zeros(length, dtype=float)
+        table=table.encode()
+        column=column.encode()
+        value= _double()
+        row=_int(0)
         for nn in range(length):
-            out[nn] = self.get_table_double(table, column, nn+1)
+            row.value+=1
+            self.lib.double_from_table_row_(
+                    table, column,  row, value)
+            out[nn] = value.value
         return out
 
     def get_column_string(self, table, column):
         length = self.get_table_length(table)
         out = np.zeros(length, dtype='S50')
+        table=table.encode()
+        column=column.encode()
+        value = ct.create_string_buffer(50)
+        row=_int(0)
         for nn in range(length):
-            out[nn] = self.get_table_string(table, column, nn+1)
+            row.value+=1
+            self.lib.string_from_table_row_(
+                    table, column, row, value)
+            out[nn]=value.value
         return out
