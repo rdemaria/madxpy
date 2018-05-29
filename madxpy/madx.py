@@ -8,6 +8,8 @@ void    set_variable(const char* name, double* value);
 
 int     double_from_table_row(const char* table, const char* name, const int* row, double* val);
 int     string_from_table_row(const char* table, const char* name, const int* row, char* string);
+int     table_length(const char* table);
+
 
 TODO:
 int     table_exists(const char* table);
@@ -17,6 +19,8 @@ int     table_cell_exists(const char* table, const char* name, const int*     ro
 
 import os
 import ctypes as ct
+
+import numpy as np
 
 _int = ct.c_int
 _double = ct.c_double
@@ -36,19 +40,21 @@ class expr(object):
 
 
 def _mklist(args):
-   out = []
-   for k, v in args.items():
-       if isinstance(v, expr):
-           out.append(f"{k}:={v!r}")
-       else:
-           out.append(f"{k}={v!r}")
-   out = ','.join(out)
-   out = out.replace('[', '{').replace(']', '}')
-   return out
+    out = []
+    for k, v in args.items():
+        if isinstance(v, expr):
+            out.append(f"{k}:={v!r}")
+        else:
+            out.append(f"{k}={v!r}")
+    out = ','.join(out)
+    out = out.replace('[', '{').replace(']', '}')
+    return out
 
 
 _mod_path = os.path.dirname(os.path.abspath(__file__))
 _mad_path = os.path.join(_mod_path, "libmadx-linux64-gnu.so")
+
+_buffer = _char50()
 
 
 class Mad(object):
@@ -60,34 +66,65 @@ class Mad(object):
         lib.get_variable_.argtypes = [_char_p]
         lib.get_variable_.restype = _double
         lib.set_variable_.argtypes = [_char_p, _double_p]
-        lib.double_from_table_row_.argtypes = [_char_p, _char_p, _int_p, _double_p]
-        lib.string_from_table_row_.argtypes = [_char_p, _char_p, _int_p, _char_p]
-        self.lib= lib
+        lib.double_from_table_row_.argtypes = [
+            _char_p, _char_p, _int_p, _double_p]
+        lib.string_from_table_row_.argtypes = [
+            _char_p, _char_p, _int_p, _char_p]
+        lib.table_length_.argtypes = [_char_p]
+        lib.table_length_.restype = _int
+        self.lib = lib
+
     def input(self, command):
         self.lib.pro_input_(command.encode())
+
     def __del__(self):
         return self.lib.mad_fini()
+
     def get_variable(self, name):
         return self.lib.get_variable_(name.encode())
+
     def set_variable(self, name, value):
-        value= _double(value)
+        value = _double(value)
         self.lib.set_variable_(name.encode(), value)
+
     def set_expression(self, name, expr):
         self.input(f"{name}:={expr};")
+
     def command(self, name, **args):
         cmd = "{},{};".format(name, _mklist(args))
         self.input(cmd)
+
     def element(self, label, command, **args):
-        cmd= "{}:{},{};".format(label, command, _mklist(args))
+        cmd = "{}:{},{};".format(label, command, _mklist(args))
         self.input(cmd)
-    def get_table_double(self,table,column,row):
-        value=_double()
-        row=_int(row)
-        self.lib.double_from_table_row_(table.encode(),column.encode(),row,value)
+
+    def get_table_double(self, table, column, row):
+        value = _double()
+        row = _int(row)
+        self.lib.double_from_table_row_(
+            table.encode(), column.encode(), row, value)
         return value.value
-    def get_table_string(self,table,column,row):
-        value=_char50()
-        row=_int(row)
-        self.lib.string_from_table_row_(table.encode(),column.encode(),row,value)
+
+    def get_table_string(self, table, column, row):
+        value = _buffer
+        row = _int(row)
+        self.lib.string_from_table_row_(
+            table.encode(), column.encode(), row, value)
         return value.value.decode()
 
+    def get_table_length(self, table):
+        return self.lib.table_length_(table.encode())
+
+    def get_column_double(self, table, column):
+        length = self.get_table_length(table)
+        out = np.zeros(length, dtype=float)
+        for nn in range(length):
+            out[nn] = self.get_table_double(table, column, nn+1)
+        return out
+
+    def get_column_string(self, table, column):
+        length = self.get_table_length(table)
+        out = np.zeros(length, dtype='S50')
+        for nn in range(length):
+            out[nn] = self.get_table_string(table, column, nn+1)
+        return out

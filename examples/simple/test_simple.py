@@ -17,6 +17,13 @@ mad.get_table_double('tab','a',1)
 mad.get_table_double('tab','b',1)
 mad.get_table_double('tab','c',1)
 
+mad.get_table_length('tab')
+mad.command('fill',table='tab')
+mad.get_table_length('tab')
+mad.get_table_column('tab','b')
+
+
+
 
 
 
