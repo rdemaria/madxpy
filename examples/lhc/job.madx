@@ -1,0 +1,15 @@
+! Links definitions
+option, warn,info;
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runII/2016 db5";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runII/2017 2017";
+
+! Sequence definition
+Option, -echo,-warn,-info;
+call,file="/afs/cern.ch/eng/lhc/optics/runII/2016/toolkit/macro.madx";
+call,file="/afs/cern.ch/eng/lhc/optics/runII/2017/lhc_as-built.seq";
+call,file="/afs/cern.ch/eng/lhc/optics/runII/2017/opticsfile.19_ctpps2";
+exec,mk_beam(6500);
+
+use,sequence=lhcb1; twiss;
+use,sequence=lhcb2; twiss;
+
