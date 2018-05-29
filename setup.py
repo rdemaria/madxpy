@@ -19,7 +19,7 @@ setuptools.setup(
         author_email='riccardo.de.maria@cern.ch',
         url='https://github.com/rdemaria/pjlsa',
         packages=['madxpy'],
-        package_dir={'madxpy': 'madpy'},
+        package_dir={'madxpy': 'madxpy'},
         python_requires='>=3.6',
         )
 

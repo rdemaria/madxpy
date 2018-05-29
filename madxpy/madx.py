@@ -59,7 +59,7 @@ class Mad(object):
         lib.pro_input_.argtypes = [_char_p]
         lib.get_variable_.argtypes = [_char_p]
         lib.get_variable_.restype = _double
-        lib.set_variable_.argtypes = [_char_p, _double]
+        lib.set_variable_.argtypes = [_char_p, _double_p]
         lib.double_from_table_row_.argtypes = [_char_p, _char_p, _int_p, _double_p]
         lib.string_from_table_row_.argtypes = [_char_p, _char_p, _int_p, _char_p]
         self.lib= lib
