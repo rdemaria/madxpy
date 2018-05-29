@@ -35,7 +35,8 @@ def _mklist(args):
    return out
 
 
-_mad_path=os.path.join(__file__,"libmadx-linux64-gnu.so")
+_mod_path=os.path.dirname(os.path.abspath(__file__))
+_mad_path=os.path.join(_mod_path,"libmadx-linux64-gnu.so")
 
 class Mad(object):
     def __init__(self,mad_path=_mad_path):
