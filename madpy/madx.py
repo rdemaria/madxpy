@@ -15,6 +15,7 @@ int     string_from_table_row(const char* table, const char* name, const int* ro
 
 """
 
+import os
 import ctypes as ct
 
 
@@ -34,8 +35,10 @@ def _mklist(args):
    return out
 
 
+_mad_path=os.path.join(__file__,"libmadx-linux64-gnu.so")
+
 class Mad(object):
-    def __init__(self,mad_path='../build/libs/madx/libmadx-linux64-gnu.so'):
+    def __init__(self,mad_path=_mad_path):
         lib=ct.CDLL(mad_path)
         lib.mad_init(0,"")
         lib.mad_init.argtypes=[ct.c_int,ct.c_char_p]
