@@ -1,6 +1,6 @@
-import madpy
+import madxpy
 
-mad=madpy.Mad()
+mad=madxpy.Mad()
 
 
 mad.command('call',file="job.madx")

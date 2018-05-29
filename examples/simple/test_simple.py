@@ -1,6 +1,6 @@
-import madpy
+import madxpy
 
-mad=madpy.Mad()
+mad=madxpy.Mad()
 
 mad.input("a=3;")
 mad.input("value,a;")
