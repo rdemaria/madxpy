@@ -20,7 +20,7 @@ mad.get_table_double('tab','c',1)
 mad.get_table_length('tab')
 mad.command('fill',table='tab')
 mad.get_table_length('tab')
-mad.get_table_column('tab','b')
+mad.get_column_double('tab','b')
 
 
 
